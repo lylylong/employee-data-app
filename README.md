@@ -47,6 +47,7 @@ Update the mySQL password:
 
 ## Built With
 
+- JavaScript
 - Node.js
 - MySQL
 
