@@ -1,13 +1,12 @@
 // initial require
 const inquirer = require("inquirer");
 const db = require("./db");
-// const logo = require("asciiart-logo");
+const logo = require("asciiart-logo");
 require("console.table");
 
 const appProcess = function () {
-  console.log(`
-  
-    Employee Data App`);
+  const loading = logo({ name: "Employee Data" }).render();
+  console.log(loading);
 
   function showMenu() {
     inquirer
@@ -67,10 +66,11 @@ const appProcess = function () {
 
   showMenu();
 
+  // view all departments
   function viewAllDepartments() {
     db.findAllDepartments()
       .then(([rows]) => {
-        // console.log("View all departments");
+        console.log("\n");
         console.table(rows);
         console.log("\n");
       })
@@ -78,10 +78,12 @@ const appProcess = function () {
         showMenu();
       });
   }
+
+  // view all roles
   function viewAllRoles() {
     db.findAllRoles()
       .then(([rows]) => {
-        // console.log("View all roles");
+        console.log("\n");
         console.table(rows);
         console.log("\n");
       })
@@ -89,10 +91,12 @@ const appProcess = function () {
         showMenu();
       });
   }
+
+  // view all employees
   function viewAllEmployees() {
     db.findAllEmployees()
       .then(([rows]) => {
-        // console.log("View all employees");
+        console.log("\n");
         console.table(rows);
         console.log("\n");
       })
@@ -100,15 +104,108 @@ const appProcess = function () {
         showMenu();
       });
   }
+
+  // to add a department
   function addADepartment() {
-    console.log("NA");
-    showMenu();
-  }
-  function addARole() {
-    console.log("NA");
-    showMenu();
+    inquirer
+      .prompt([
+        {
+          name: "departmentName",
+          message: "Input the new department:",
+        },
+      ])
+      .then((res) => {
+        let departmentName = res.departmentName;
+        let newDepartment = {
+          department_name: departmentName,
+        };
+
+        db.createDepartment(newDepartment)
+          .then(function () {
+            console.log("\n");
+            console.log(
+              "You added " +
+                departmentName +
+                ", as a new department, to the database!"
+            );
+            console.log("\n");
+          })
+          .then(() => {
+            showMenu();
+          });
+      });
+
+    // console.log("NA");
+    // showMenu();
   }
 
+  // to add a role
+  function addARole() {
+    inquirer
+      .prompt([
+        {
+          name: "roleTitle",
+          message: "Input the new role title:",
+        },
+      ])
+      .then((res) => {
+        let roleTitle = res.roleTitle;
+
+        inquirer
+          .prompt([
+            {
+              name: "salary",
+              message: "Input the new role salary:",
+            },
+          ])
+          .then((res) => {
+            let salary = res.salary;
+
+            db.findAllDepartments().then(([rows]) => {
+              let departmentRows = rows;
+              const departmentsChoices = departmentRows.map(
+                ({ id, department_name }) => ({
+                  name: department_name,
+                  value: id,
+                })
+              );
+
+              inquirer
+                .prompt([
+                  {
+                    type: "list",
+                    name: "departmentId",
+                    message: "Choose the new role's department:",
+                    choices: departmentsChoices,
+                  },
+                ])
+                .then((res) => {
+                  let departmentId = res.departmentId;
+                  let newRole = {
+                    role_title: roleTitle,
+                    salary: salary,
+                    department_id: departmentId,
+                  };
+                  db.createRole(newRole)
+                    .then(function () {
+                      console.log("\n");
+                      console.log(
+                        "You added " +
+                          roleTitle +
+                          ", as a new role, to the database!"
+                      );
+                      console.log("\n");
+                    })
+                    .then(() => {
+                      showMenu();
+                    });
+                });
+            });
+          });
+      });
+  }
+
+  // to add an employee
   function addAEmployee() {
     inquirer
       .prompt([
@@ -163,9 +260,13 @@ const appProcess = function () {
                   db.createEmployee(newEmployee);
                 })
                 .then(function () {
+                  console.log("\n");
                   console.log(
-                    "You added " + employeeName + " to the database!"
+                    "You added " +
+                      employeeName +
+                      ", as an new employee, to the database!"
                   );
+                  console.log("\n");
                 })
                 .then(() => {
                   showMenu();
@@ -173,10 +274,9 @@ const appProcess = function () {
             });
         });
       });
-    // console.log("NA");
-    // showMenu();
   }
 
+  // to update an employee's role
   function UpdateAnEmployeeRole() {
     db.findAllEmployees().then(([rows]) => {
       let employeeRows = rows;
@@ -219,7 +319,11 @@ const appProcess = function () {
               .then((res) => {
                 let roleId = res.roleId;
                 db.updateEmployeesRoleTitle(employeeId, roleId);
-                //   console.log("You updated an employee's title");
+              })
+              .then(() => {
+                console.log("\n");
+                console.log("You updated an employee's title!");
+                console.log("\n");
               })
               .then(() => {
                 showMenu();
@@ -232,12 +336,14 @@ const appProcess = function () {
   }
 
   function leaveApp() {
-    console.log("See you next time!");
+    console.log(`
+
+See you next time!
+
+    `);
     // Exit from a Node
     process.exit();
   }
 };
 
 appProcess();
-
-// console.log("Now runing node index!");

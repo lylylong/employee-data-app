@@ -23,6 +23,16 @@ class DB {
     return this.connection.promise().query(querySQL);
   }
 
+  createDepartment(newDepartment) {
+    return this.connection
+      .promise()
+      .query("INSERT INTO departmentTB SET ?", newDepartment);
+  }
+
+  createRole(newRole) {
+    return this.connection.promise().query("INSERT INTO roleTB SET ?", newRole);
+  }
+
   createEmployee(newEmployee) {
     return this.connection
       .promise()
