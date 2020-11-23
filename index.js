@@ -4,10 +4,12 @@ const db = require("./db");
 const logo = require("asciiart-logo");
 require("console.table");
 
+// the app working process
 const appProcess = function () {
   const loading = logo({ name: "Employee Data" }).render();
   console.log(loading);
 
+  // main menu
   function showMenu() {
     inquirer
       .prompt([
@@ -64,6 +66,7 @@ const appProcess = function () {
       });
   }
 
+  // initial the menu
   showMenu();
 
   // view all departments
@@ -119,7 +122,6 @@ const appProcess = function () {
         let newDepartment = {
           department_name: departmentName,
         };
-
         db.createDepartment(newDepartment)
           .then(function () {
             console.log("\n");
@@ -134,9 +136,6 @@ const appProcess = function () {
             showMenu();
           });
       });
-
-    // console.log("NA");
-    // showMenu();
   }
 
   // to add a role
@@ -150,7 +149,6 @@ const appProcess = function () {
       ])
       .then((res) => {
         let roleTitle = res.roleTitle;
-
         inquirer
           .prompt([
             {
@@ -160,7 +158,6 @@ const appProcess = function () {
           ])
           .then((res) => {
             let salary = res.salary;
-
             db.findAllDepartments().then(([rows]) => {
               let departmentRows = rows;
               const departmentsChoices = departmentRows.map(
@@ -169,7 +166,6 @@ const appProcess = function () {
                   value: id,
                 })
               );
-
               inquirer
                 .prompt([
                   {
@@ -216,14 +212,12 @@ const appProcess = function () {
       ])
       .then((res) => {
         let employeeName = res.employeeName;
-
         db.findAllRoles().then(([rows]) => {
           let roleRows = rows;
           const roleChoices = roleRows.map(({ id, title }) => ({
             name: title,
             value: id,
           }));
-
           inquirer
             .prompt([
               {
@@ -235,7 +229,6 @@ const appProcess = function () {
             ])
             .then((res) => {
               let roleId = res.roleId;
-
               inquirer
                 .prompt([
                   {
@@ -256,7 +249,6 @@ const appProcess = function () {
                     role_id: roleId,
                     manager_name: managerName,
                   };
-
                   db.createEmployee(newEmployee);
                 })
                 .then(function () {
@@ -280,12 +272,11 @@ const appProcess = function () {
   function UpdateAnEmployeeRole() {
     db.findAllEmployees().then(([rows]) => {
       let employeeRows = rows;
-      // need to ask
+      // need to learn more about the map method
       const employeeChoices = employeeRows.map(({ id, full_name }) => ({
         name: full_name,
         value: id,
       }));
-
       inquirer
         .prompt([
           {
@@ -330,8 +321,6 @@ const appProcess = function () {
               });
           });
         });
-
-      //   console.log("\n");
     });
   }
 
@@ -346,4 +335,5 @@ See you next time!
   }
 };
 
+// initial the app
 appProcess();
